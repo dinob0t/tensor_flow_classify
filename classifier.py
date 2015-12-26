@@ -59,7 +59,7 @@ tf.app.flags.DEFINE_string(
     """imagenet_2012_challenge_label_map_proto.pbtxt.""")
 tf.app.flags.DEFINE_string('image_file', '',
                            """Absolute path to image file.""")
-tf.app.flags.DEFINE_integer('num_top_predictions', 5,
+tf.app.flags.DEFINE_integer('num_top_predictions', 10,
                             """Display this many predictions.""")
 
 # pylint: disable=line-too-long
@@ -148,8 +148,9 @@ def run_inference_on_image(image):
     image: Image file name.
 
     Returns:
-    Nothing
+    results: dictonary of objects and score
   """
+    results = {}
     if not gfile.Exists(image):
         tf.logging.fatal('File does not exist %s', image)
     image_data = gfile.FastGFile(image, 'rb').read()
@@ -175,10 +176,13 @@ def run_inference_on_image(image):
         node_lookup = NodeLookup()
 
         top_k = predictions.argsort()[-FLAGS.num_top_predictions:][::-1]
+
         for node_id in top_k:
             human_string = node_lookup.id_to_string(node_id)
             score = predictions[node_id]
-            print('%s (score = %.5f)' % (human_string, score))
+            if human_string and score:
+                results[human_string] = str(score)
+    return results
 
 
 def maybe_download_and_extract():

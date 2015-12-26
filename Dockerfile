@@ -8,4 +8,4 @@ RUN pip install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/te
 ADD ./ /opt/tensor/
 WORKDIR /opt/tensor
 EXPOSE 5000
-#CMD ["python", "app.py"]
+CMD ["python", "app.py"]
